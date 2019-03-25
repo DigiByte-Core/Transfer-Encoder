@@ -1,4 +1,4 @@
-var ccEncoding = require(__dirname + '/../transferEncoder')
+var daEncoding = require(__dirname + '/../transferEncoder')
 var assert = require('assert')
 
 var consumer = function (buff) {
@@ -46,24 +46,24 @@ describe('Colored-Coins transfer Decoding', function () {
 
     data.payments = []
     data.payments.push({skip: false, range: false, percent: true, output: 12, amount: 3213213})
-    var result = ccEncoding.encode(data, 40)
+    var result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
 
     data.payments.push({skip: false, range: false, percent: true, output: 1, amount: 321321321})
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
 
     data.payments.push({skip: true, range: true, percent: true, output: 10, amount: 1})
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
 
     data.payments.push({skip: false, range: false, percent: true, output: 20, amount: 100000021000})
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
 
     data.payments.push({skip: false, range: false, percent: false, output: 0, amount: 1})
     data.payments.push({skip: false, range: false, percent: false, output: 1, amount: 2})
@@ -72,27 +72,27 @@ describe('Colored-Coins transfer Decoding', function () {
     data.payments.push({skip: true, range: false, percent: false, output: 4, amount: 5})
     data.payments.push({skip: false, range: false, percent: false, output: 5, amount: 6})
 
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
 
     // check throws when pushing burn to a default transfer transaction
     assert.throws(function () {
       data.payments.push({skip: false, percent: false, amount: 7, burn: true})
-      ccEncoding.encode(data, 40)
+      daEncoding.encode(data, 40)
     }, /Needs output value/,
     'Should Throw Error')
 
     // now no error
     data.type = 'burn'
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
 
     delete data.allowMeta
     data.payments = []
     data.payments.push({skip: false, range: false, percent: true, output: 12, amount: 3213213})
-    result = ccEncoding.encode(data, 40)
+    result = daEncoding.encode(data, 40)
     console.log(result.codeBuffer.toString('hex'), result.leftover)
-    console.log(ccEncoding.decode(result.codeBuffer))
+    console.log(daEncoding.decode(result.codeBuffer))
     done()
   })
 })
@@ -112,7 +112,7 @@ describe('80 byte OP_RETURN', function () {
   it('Transfer OP_CODE 0x15 - No Metadata', function (done) {
     this.timeout(0)
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -121,7 +121,7 @@ describe('80 byte OP_RETURN', function () {
     assert.deepEqual(toBuffer('15'), consume(1))  //trasnfer OP_CODE
     assert.deepEqual(toBuffer('011f'), consume(2))  //payments
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
@@ -136,7 +136,7 @@ describe('80 byte OP_RETURN', function () {
     data.torrentHash = torrentHash
     data.noRules = true
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -146,7 +146,7 @@ describe('80 byte OP_RETURN', function () {
     assert.deepEqual(toBuffer('46b7e0d000d69330ac1caa48c6559763828762e1'), consume(20))   //torrent hash
     assert.deepEqual(toBuffer('011f'), consume(2))  //payments
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
@@ -162,7 +162,7 @@ describe('80 byte OP_RETURN', function () {
     data.torrentHash = torrentHash
     delete data.noRules
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -172,7 +172,7 @@ describe('80 byte OP_RETURN', function () {
     assert.deepEqual(toBuffer('46b7e0d000d69330ac1caa48c6559763828762e1'), consume(20))   //torrent hash
     assert.deepEqual(toBuffer('011f'), consume(2))  //payments
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
@@ -194,7 +194,7 @@ describe('80 byte OP_RETURN', function () {
     data.torrentHash = torrentHash
     data.sha2 = sha2
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -207,7 +207,7 @@ describe('80 byte OP_RETURN', function () {
       assert.deepEqual(toBuffer('0101'), consume(2))    //payment
     }
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
@@ -224,7 +224,7 @@ describe('80 byte OP_RETURN', function () {
     //1 more transfer instruction (2 bytes in this case) should push torrent hash out
     data.payments.push({skip: false, range: false, percent: false, output: 1, amount: 1})
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -234,7 +234,7 @@ describe('80 byte OP_RETURN', function () {
     assert.deepEqual(toBuffer('46b7e0d000d69330ac1caa48c6559763828762e1'), consume(20))   //torrent hash
     assert.deepEqual(toBuffer('0101'), consume(2))  //payments
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
@@ -255,7 +255,7 @@ describe('80 byte OP_RETURN', function () {
       data.payments.push({skip: false, range: false, percent: false, output: 1, amount: 1})
     }
 
-    code = ccEncoding.encode(data, 80)    
+    code = daEncoding.encode(data, 80)    
 
     console.log(code.codeBuffer.toString('hex'), code.leftover)
     var consume = consumer(code.codeBuffer.slice(0, code.codeBuffer.length))
@@ -266,7 +266,7 @@ describe('80 byte OP_RETURN', function () {
       assert.deepEqual(toBuffer('0101'), consume(2))    //payment
     }
 
-    decoded = ccEncoding.decode(code.codeBuffer)
+    decoded = daEncoding.decode(code.codeBuffer)
     console.log(decoded)
 
     assert.equal(decoded.protocol, data.protocol)
