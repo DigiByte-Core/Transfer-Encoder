@@ -1,7 +1,10 @@
-var TYPE_MASK = 0xf0
-var TRANSFER_MASK = 0x10
-var BURN_MASK = 0x20
-var TRANSFER_OP_CODES = [
+const transferPaymentEncoder = require('digiasset-payment-encoder')
+const burnPaymentEncoder = require('digiasset-burn-payment-encoder')
+
+const TYPE_MASK = 0xf0
+const TRANSFER_MASK = 0x10
+const BURN_MASK = 0x20
+const TRANSFER_OP_CODES = [
   new Buffer([0x10]), // All Hashes in OP_RETURN
   new Buffer([0x11]), // SHA2 in Pay-to-Script-Hash multi-sig output (1 out of 2)
   new Buffer([0x12]), // All Hashes in Pay-to-Script-Hash multi-sig outputs (1 out of 3)
@@ -9,7 +12,7 @@ var TRANSFER_OP_CODES = [
   new Buffer([0x14]), // Low security transaction no SHA2 for torrent data. SHA1 is always inside OP_RETURN in this case. also no rules inside the metadata (if there are any they will be in ignored)
   new Buffer([0x15])  // No metadata or rules (no SHA1 or SHA2)
 ]
-var BURN_OP_CODES = [
+const BURN_OP_CODES = [
   new Buffer([0x20]), // All Hashes in OP_RETURN
   new Buffer([0x21]), // SHA2 in Pay-to-Script-Hash multi-sig output (1 out of 2)
   new Buffer([0x22]), // All Hashes in Pay-to-Script-Hash multi-sig outputs (1 out of 3)
@@ -18,17 +21,14 @@ var BURN_OP_CODES = [
   new Buffer([0x25])  // No metadata or rules (no SHA1 or SHA2)
 ]
 
-var transferPaymentEncoder = require('digiasset-payment-encoder')
-var burnPaymentEncoder = require('digiasset-burn-payment-encoder')
-
-var consumer = function (buff) {
-  var curr = 0
+const consumer = function (buff) {
+  let curr = 0
   return function consume (len) {
     return buff.slice(curr, curr += len)
   }
 }
 
-var padLeadingZeros = function (hex, byteSize) {
+const padLeadingZeros = function (hex, byteSize) {
   return (hex.length === byteSize * 2) ? hex : padLeadingZeros('0' + hex, byteSize)
 }
 
@@ -39,15 +39,15 @@ module.exports = {
       ) {
       throw new Error('Missing Data')
     }
-    var opcode
-    var OP_CODES = data.type === 'burn' ? BURN_OP_CODES : TRANSFER_OP_CODES
-    var paymentEncoder = data.type === 'burn' ? burnPaymentEncoder : transferPaymentEncoder
-    var hash = new Buffer(0)
-    var protocol = new Buffer(padLeadingZeros(data.protocol.toString(16), 2), 'hex')
-    var version = new Buffer([data.version])
-    var transferHeader = Buffer.concat([protocol, version])
-    var payments = paymentEncoder.encodeBulk(data.payments)
-    var issueByteSize = transferHeader.length + payments.length + 1
+    let opcode
+    const OP_CODES = data.type === 'burn' ? BURN_OP_CODES : TRANSFER_OP_CODES
+    const paymentEncoder = data.type === 'burn' ? burnPaymentEncoder : transferPaymentEncoder
+    let hash = Buffer.allocUnsafe(0)
+    const protocol = Buffer.from(padLeadingZeros(data.protocol.toString(16), 2), 'hex')
+    const version = Buffer.from([data.version])
+    const transferHeader = Buffer.concat([protocol, version])
+    const payments = paymentEncoder.encodeBulk(data.payments)
+    let issueByteSize = transferHeader.length + payments.length + 1
 
     if (issueByteSize > byteSize) throw new Error('Data code is bigger then the allowed byte size')
     if (!data.sha2) {
@@ -78,13 +78,13 @@ module.exports = {
   },
 
   decode: function (op_code_buffer) {
-    var data = {}
-    var consume = consumer(op_code_buffer)
+    const data = {}
+    const consume = consumer(op_code_buffer)
     data.protocol = parseInt(consume(2).toString('hex'), 16)
     data.version = parseInt(consume(1).toString('hex'), 16)
     data.multiSig = []
-    var opcode = consume(1)
-    var paymentEncoder
+    const opcode = consume(1)
+    let paymentEncoder
     if ((opcode[0] & TYPE_MASK) === TRANSFER_MASK) {
       paymentEncoder = transferPaymentEncoder
     } else if ((opcode[0] & TYPE_MASK) === BURN_MASK) {
