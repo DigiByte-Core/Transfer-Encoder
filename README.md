@@ -8,7 +8,7 @@ Transfer-Encoder provides the encode/decode functions between a Colored Coins tr
 ### Installation
 
 ```sh
-$ npm install cc-transfer-encoder
+$ npm install digiasset-transfer-encoder
 ```
 
 
@@ -28,7 +28,7 @@ Returns a new Buffer holding the encoded transfer.
 ##### Example:
 
 ```js
-var transferEncoder = require('cc-transfer-encoder')
+var transferEncoder = require('digiasset-transfer-encoder')
 
 
 ```
@@ -44,7 +44,7 @@ Returns a Colored Coins payment Object
 ##### Example:
 
 ```js
-var transferEncoder = require('cc-transfer-encoder')
+var transferEncoder = require('digiasset-transfer-encoder')
 
 ```
 
@@ -53,7 +53,7 @@ var transferEncoder = require('cc-transfer-encoder')
 In order to test you need to install [mocha] globaly on your machine
 
 ```sh
-$ cd /"module-path"/cc-transfer-Encoder
+$ cd /"module-path"/digiasset-transfer-Encoder
 $ mocha
 ```
 
