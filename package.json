@@ -4,7 +4,7 @@
   "description": "The encoding/decoding functions for the digiasset scheme transfer set of OP_CODES",
   "main": "transferEncoder.js",
   "dependencies": {
-    "digiasset-payment-encoder": "^1.1.0",
+    "digiasset-payment-encoder": "^1.2.0",
     "digiasset-burn-payment-encoder": "^1.1.0"
   },
   "directories": {
